@@ -63,6 +63,14 @@ List<Dog> dogs =
         Sex = true,
         Birth = DateTime.Parse("2023-06-12"),
     },
+    new() //008
+    {
+        Name = "Queen",
+        Breed = "german sepherd",
+        Weight = 40.0F,
+        Sex = false,
+        Birth = DateTime.Parse("2022-03-25"),
+    },
 ];
 
 #region NEVEZETES ALGORITMUSOK
@@ -81,7 +89,6 @@ List<Dog> dogs =
 
 // további nevezetes algoritmusok:
 // - rendezés(ek)
-// - egyéb kereső algoritmusok...
 // ...
 #endregion
 
@@ -140,7 +147,7 @@ Console.WriteLine($"the oldest dog: {lBdDog}");
 
 Console.WriteLine("-----------------------");
 
-#region search, decision, selection
+#region search, decision, excretion
 Console.Write("type here a pet's name: ");
 var nameForSearch = Console.ReadLine();
 
@@ -152,8 +159,6 @@ else Console.WriteLine($"there are no {nameForSearch} here...");
 // First, FirstOrDefault, Last, LastOrDefault, Single, SingleOrDefault
 // Find, Contains
 // Any, All
-
-
 
 //FIRST
 //var frstLINQ = dogs.First(d => d.Name == nameForSearch);
@@ -221,3 +226,109 @@ Console.WriteLine(frstOrDefLINQ is null
 // C# 'struct' -> VALUE
 
 #endregion
+
+Console.WriteLine("-----------------------");
+
+#region selection
+List<Dog> mbd = [];
+foreach (var dog in dogs)
+    if (dog.Breed == "mixed breed")
+        mbd.Add(dog);
+Console.WriteLine("mb dogs:");
+foreach (var dog in mbd) Console.WriteLine($"\t -{dog}");
+
+var mixedBreedDogs = dogs.Where(d => d.Breed == "mixed breed");
+Console.WriteLine("mixed breed dogs:");
+foreach (var dog in mixedBreedDogs)
+    Console.WriteLine($"\t- {dog}");
+#endregion
+
+Console.WriteLine("-----------------------");
+
+#region gouping
+Dictionary<string, List<Dog>> dogBreedGroups = [];
+foreach (var dog in dogs)
+{
+    if (!dogBreedGroups.ContainsKey(dog.Breed))
+    {
+        dogBreedGroups.Add(dog.Breed, []);
+    }
+    dogBreedGroups[dog.Breed].Add(dog);   
+}
+foreach (var kvp in dogBreedGroups)
+{
+    Console.WriteLine($"{kvp.Key}(s):");
+    foreach (var dog in kvp.Value) Console.WriteLine($"\t -{dog.Name}");
+}
+Console.WriteLine("-----------------------");
+var dbgLINQ = dogs.GroupBy(d => d.Breed);
+foreach (var grp in dbgLINQ)
+{
+    Console.WriteLine($"{grp.Key} ({grp.Count()} dog)");
+    //foreach (var dog in grp) Console.WriteLine($"\t---{dog.Name}");
+}
+
+
+#endregion
+
+Console.WriteLine("-----------------------");
+
+//<collection>.Union() -> unió
+//<collection>.Intersect() -> metszet
+//<collection>.Except() -> (halmazelméleti) különbség
+
+Console.WriteLine("-----------------------");
+
+#region distinct
+var dogBreeds = dogs.Select(d => d.Breed).Distinct();
+Console.WriteLine("all dogbreeds:");
+foreach (var b in dogBreeds) Console.WriteLine($"\t- {b}");
+
+List<string> breeds = [];
+foreach (var dog in dogs)
+    if (!breeds.Contains(dog.Breed))
+        breeds.Add(dog.Breed);
+Console.WriteLine("all dogbreeds again:");
+foreach (var b in breeds) Console.WriteLine($"\t- {b}");
+#endregion
+
+Console.WriteLine("-----------------------");
+
+#region ordering, sorting
+var dogsByAlphapeticOrder = dogs.OrderBy(d => d.Name).ThenBy(d => d.Birth);
+Console.WriteLine("all dog, ordering by name:");
+foreach (var dog in dogsByAlphapeticOrder) Console.WriteLine($"\t- {dog}");
+
+
+var dogByAgeDesc = dogs.OrderByDescending(d => d.Age);
+Console.WriteLine("all dog decending by age:");
+foreach (var dog in dogByAgeDesc) Console.WriteLine($"\t- {dog}");
+
+Console.Write("hungarian names by alphabetical order: ");
+List<string> nevek = ["Béla", "Dezső", "Özséb", "Ádám", "Zoltán", "Éva", "Aladár"];
+var rendezettNevek = nevek.Order();
+Console.WriteLine(string.Join(", ", rendezettNevek));
+
+
+for (int i = 0; i < dogs.Count - 1; i++)
+{
+    for (int j = i + 1; j < dogs.Count; j++)
+    {
+        if (dogs[i].Weight > dogs[j].Weight)
+        {
+            Dog tmp = dogs[i];
+            dogs[i] = dogs[j];
+            dogs[j] = tmp;
+
+            //(dogs[j], dogs[i]) = (dogs[i], dogs[j]);
+        }
+    }
+}
+
+//<collection>.Sort() <- Collections.Generic-ben, delegate-el meg klehet neki mondani az összehasonlítás alapját, HELYBEN RENDEZ
+
+Console.WriteLine("dogs sorting by weight:");
+foreach (var dog in dogs) Console.WriteLine($"\t- {dog}");
+#endregion
+
+Console.WriteLine("-----------------------");
